@@ -50,6 +50,8 @@ async def async_setup_entry(
             WyomingSatellitePipelineSelect(hass, device),
             WyomingSatelliteNoiseSuppressionLevelSelect(device),
             WyomingSatelliteVadSensitivitySelect(hass, device),
+            WyomingSatelliteRingtoneSelect(hass, device),
+            WyomingSatelliteNotificationToneSelect(hass, device),
         ]
     )
 
@@ -115,3 +117,62 @@ class WyomingSatelliteVadSensitivitySelect(
         """Select an option."""
         await super().async_select_option(option)
         self.device.set_vad_sensitivity(VadSensitivity(option))
+
+
+class WyomingSatelliteRingtoneSelect(
+    WyomingSatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent current ringtone for the satellite."""
+
+    entity_description = SelectEntityDescription(
+        key="ringtone",
+        translation_key="ringtone",
+        entity_category=EntityCategory.CONFIG,
+    )
+
+    def __init__(self, hass: HomeAssistant, device: SatelliteDevice) -> None:
+        """Initialize entity."""
+        super().__init__(device)
+        self._attr_options = self._device.get_sounds(hass)
+        self._attr_current_option = self._attr_options[0]
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            self._attr_current_option = state.state
+            self.set_option_on_device()
+
+    async def async_select_option(self, option: str) -> None:
+        """Change the selected option."""
+        if option in self._attr_options:
+            self._attr_current_option = option
+            self.async_write_ha_state()
+            self.set_option_on_device()
+
+    def set_option_on_device(self) -> None:
+        """Set the current option on the device."""
+        self._device.set_ringtone(self.current_option)
+
+
+class WyomingSatelliteNotificationToneSelect(WyomingSatelliteRingtoneSelect):
+    """Entity to represent current ringtone for the satellite."""
+
+    entity_description = SelectEntityDescription(
+        key="notificationtone",
+        translation_key="notificationtone",
+        entity_category=EntityCategory.CONFIG,
+    )
+
+    def __init__(self, hass: HomeAssistant, device: SatelliteDevice) -> None:
+        """Initialize entity."""
+        super().__init__(hass, device)
+        self._attr_options = ["Speak", *self._device.get_sounds(hass)]
+
+    def set_option_on_device(self) -> None:
+        """Set the current option on the device."""
+        self._device.set_notificationtone(
+            self.current_option if self.current_option != "Speak" else None
+        )

@@ -1,0 +1,17 @@
+{
+  "domain": "camera_player",
+  "name": "Camera Player",
+  "codeowners": [
+    "@Schevv"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/camera_player",
+  "homekit": {},
+  "iot_class": "local_push",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
+  "integration_type": "helper",
+  "version": "1.0"
+}

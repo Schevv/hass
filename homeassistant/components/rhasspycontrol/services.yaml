@@ -1,0 +1,70 @@
+text_to_speech:
+  name: Rhasspy Text-To-Speech
+  description: Makes one or multiple Rhasspy instances speak a text
+  target:
+    device:
+      integration: rhasspycontrol
+  fields:
+    text:
+      name: Text
+      description: Text to Speak
+      required: true
+      selector:
+        text:
+          multiline: true
+          type: text
+    rhasspy:
+      name: Rhasspy
+      description: The rhasspy instance to target
+    voice:
+      name: Voice
+      description: Voice to speak this in
+      selector:
+        text:
+          type: text
+    language:
+      name: Language
+      description: Language to speak this in
+      selector:
+        text:
+          type: text
+    volume:
+      name: Volume
+      description: Sets the volume for this speech
+      selector:
+        number:
+          min: 0
+          max: 200
+          step: 1
+          unit_of_measurement: "%"
+    siteid:
+      name: SiteID
+      description: Send to certain Rhasspy site ids
+      selector:
+        text:
+          type: text
+play_sound:
+  name: Rhasspy Play Sound
+  description: Makes Rhasspy play a pre-defined sound effect
+  target:
+    device:
+      integration: rhasspycontrol
+  fields:
+    sound:
+      name: Sound
+      description: Sets the sound to play
+      selector:
+        select:
+          options:
+            - Notification
+            - Correct
+            - HappyBells
+            - Rooster
+            - Air Plane Ding
+            - Glass Ping
+            - Music Box
+            - SMS Alert 1
+            - SMS Alert 2
+            - SMS Alert 3
+            - SMS Alert 4
+            - SMS Alert 5

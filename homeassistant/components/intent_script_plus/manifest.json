@@ -1,0 +1,12 @@
+{
+  "domain": "intent_script_plus",
+  "name": "Intent Script Plus",
+  "config_flow": false,
+  "codeowners": ["@Schevv"],
+  "documentation": "https://www.home-assistant.io/integrations/intent_script",
+  "requirements": [],
+  "dependencies": [],
+  "iot_class": "local_push",
+  "version": 1.0,
+  "loggers": ["intent_script_plus"]
+}

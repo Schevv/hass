@@ -1,0 +1,14 @@
+{
+  "domain": "device_tracker_helper",
+  "name": "Device Tracker Helper",
+  "codeowners": ["@Schevv"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/device_tracker_helper",
+  "homekit": {},
+  "integration_type": "helper",
+  "iot_class": "calculated",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": []
+}

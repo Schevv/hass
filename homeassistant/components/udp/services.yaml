@@ -1,0 +1,29 @@
+send:
+  name: Send UDP
+  description: Sends a UDP packet to a given IP address
+  fields:
+    message:
+      name: Message
+      description: Message to send
+      required: true
+      selector:
+        text:
+          type: text
+    ip:
+      name: IP-Address
+      description: Destination IP address
+      required: true
+      example: "127.0.0.1"
+      selector:
+        text:
+          type: text
+    port:
+      name: Port
+      description: Destination Port
+      required: true
+      example: 1024
+      selector:
+        number:
+          min: 1
+          max: 65535
+          mode: box

@@ -4,12 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+import importlib.resources
+import logging
+from pathlib import Path
+from typing import Any
 
 from homeassistant.components.assist_pipeline.vad import VadSensitivity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 
+from . import sounds
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -25,11 +32,32 @@ class SatelliteDevice:
     auto_gain: int = 0
     volume_multiplier: float = 1.0
     vad_sensitivity: VadSensitivity = VadSensitivity.DEFAULT
+    ringtone: str | None = None
+    notificationtone: str | None = None
+    last_notification: str | None = None
 
     _is_active_listener: Callable[[], None] | None = None
     _is_muted_listener: Callable[[], None] | None = None
     _pipeline_listener: Callable[[], None] | None = None
     _audio_settings_listener: Callable[[], None] | None = None
+    _audio_play_listener: Callable[[bytes], None] | None = None
+    _tts_play_listener: Callable[[str], None] | None = None
+    _system_stats_listener: list[Callable[[dict[str, Any]], Coroutine]] = field(
+        default_factory=list
+    )
+    _last_notification_listener: Callable[[str, str], None] | None = None
+
+    @callback
+    def tts_play(self, text: str) -> None:
+        """Speak a text on a sattelite."""
+        if self._tts_play_listener is not None:
+            self._tts_play_listener(text)
+
+    @callback
+    def play_audio(self, wav_data: bytes) -> None:
+        """Play WAV audio on a sattelite."""
+        if self._audio_play_listener is not None:
+            self._audio_play_listener(wav_data)
 
     @callback
     def set_is_active(self, active: bool) -> None:
@@ -88,6 +116,107 @@ class SatelliteDevice:
                 self._audio_settings_listener()
 
     @callback
+    def set_ringtone(self, ringtone: str) -> None:
+        """Set the ringtone."""
+        _LOGGER.warning("Setting ring tone to %s", ringtone)
+        if ringtone != self.ringtone:
+            self.ringtone = ringtone
+
+    @callback
+    def set_notificationtone(self, notificationtone: str) -> None:
+        """Set the ringtone."""
+        _LOGGER.warning("Setting notification tone to %s", notificationtone)
+        if notificationtone != self.notificationtone:
+            self.notificationtone = notificationtone
+
+    def get_custom_sounds(self, hass: HomeAssistant) -> list[str]:
+        """Return the extra sounds in the custom_sounds directory."""
+        custom_sounds_dir = Path(hass.config.path("custom_sounds"))
+        if custom_sounds_dir.is_dir():
+            return [
+                filename.stem
+                for filename in custom_sounds_dir.rglob("*.wav")
+                if filename.is_file()
+            ]
+        return []
+
+    def get_default_sounds(self) -> list[str]:
+        """Return the default sounds that come with the integration."""
+        return [
+            f.name[:-4]
+            for f in importlib.resources.files(sounds).iterdir()
+            if f.name.endswith(".wav")
+        ]
+
+    def get_sounds(self, hass: HomeAssistant) -> list[str]:
+        """Return all available sound files."""
+        cs = self.get_custom_sounds(hass)
+        for s in self.get_default_sounds():
+            if s not in cs:
+                cs.insert(0, s)
+        return cs
+
+    def play_ringtone(self, hass: HomeAssistant) -> None:
+        """Play the currently selected ringtone."""
+        if self.ringtone is None:
+            self.ringtone = self.get_sounds(hass)[0]
+            _LOGGER.warning("Setting ringtone to default %s", self.ringtone)
+        data = self.get_sound_data(hass, self.ringtone)
+        _LOGGER.warning("Getting data for ringtone %s", len(data))
+        self.play_audio(data)
+
+    def play_notificationtone(self, hass: HomeAssistant) -> None:
+        """Play the currently selected notification."""
+        _LOGGER.warning("Notification tone to play is %s", self.notificationtone)
+        if self.notificationtone is not None:
+            data = self.get_sound_data(hass, self.notificationtone)
+            _LOGGER.warning("Getting data for notification %s", len(data))
+            self.play_audio(data)
+
+    def get_notificationtone_data(self, hass: HomeAssistant) -> bytes:
+        """Get the wav data for the currently selected notificationtone."""
+        if self.notificationtone is None:
+            self.ringtone = self.get_sounds()[0]
+        return self.get_sound_data(hass, self.ringtone)
+
+    def get_sound_data(self, hass: HomeAssistant, soundfile: str) -> bytes:
+        """Get the wav data for the given sound name."""
+        custom_sounds_dir = Path(hass.config.path("custom_sounds"))
+        if custom_sounds_dir.is_dir():
+            _LOGGER.warning("custom_sounds is dir")
+            sound_path = custom_sounds_dir / (soundfile + ".wav")
+            _LOGGER.warning("sound_path is %s", sound_path)
+            if sound_path.is_file():
+                _LOGGER.warning("sound_path is file")
+                with sound_path.open("rb") as file:
+                    return file.read()
+        with (
+            importlib.resources.files(sounds)
+            .joinpath(soundfile + ".wav")
+            .open("rb") as file
+        ):
+            _LOGGER.warning("soundfile is %s", soundfile + ".wav")
+            return file.read()
+
+    def set_last_notification(self, message: str, title: str) -> None:
+        """Set last_notification."""
+        _LOGGER.warning(
+            "device last notification set %s %s %s",
+            self._last_notification_listener is not None,
+            message,
+            title,
+        )
+        self.last_notification = message
+        if self._last_notification_listener is not None:
+            self._last_notification_listener(message, title)
+
+    @callback
+    async def async_set_system_stats(self, stats: dict[str, Any]) -> None:
+        """Set the new satellite system stats."""
+        for listener in self._system_stats_listener:
+            await listener(stats)
+
+    @callback
     def set_is_active_listener(self, is_active_listener: Callable[[], None]) -> None:
         """Listen for updates to is_active."""
         self._is_active_listener = is_active_listener
@@ -103,11 +232,46 @@ class SatelliteDevice:
         self._pipeline_listener = pipeline_listener
 
     @callback
+    def set_audio_play_listener(
+        self, audio_play_listener: Callable[[bytes], None]
+    ) -> None:
+        """Listen for WAV audio to play."""
+        self._audio_play_listener = audio_play_listener
+
+    @callback
+    def set_tts_play_listener(self, tts_play_listener: Callable[[bytes], None]) -> None:
+        """Listen for tts to play."""
+        self._tts_play_listener = tts_play_listener
+
+    @callback
+    def add_system_stats_listener(
+        self, system_stats_listener: Callable[[dict[str, Any]], None]
+    ) -> None:
+        """Add a listener for system stats updates."""
+        self._system_stats_listener.append(system_stats_listener)
+
+    @callback
+    def remove_system_stats_listener(
+        self, system_stats_listener: Callable[[dict[str, Any]], None]
+    ) -> None:
+        """Remove a listener for system stats updates."""
+        self._system_stats_listener.remove(system_stats_listener)
+
+    @callback
     def set_audio_settings_listener(
         self, audio_settings_listener: Callable[[], None]
     ) -> None:
         """Listen for updates to audio settings."""
         self._audio_settings_listener = audio_settings_listener
+
+    def set_last_notification_listener(
+        self, last_notification_listener: Callable[[str], None]
+    ) -> None:
+        """Add a listener for changes of last_notification."""
+        _LOGGER.warning(
+            "last_notification_listener set %s", last_notification_listener is not None
+        )
+        self._last_notification_listener = last_notification_listener
 
     def get_assist_in_progress_entity_id(self, hass: HomeAssistant) -> str | None:
         """Return entity id for assist in progress binary sensor."""

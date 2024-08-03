@@ -1,0 +1,18 @@
+call:
+  fields:
+   service:
+     required: true
+     selector:
+       text: {}
+   data:
+     required: false
+     selector:
+       object: {}
+   target:
+     required: false
+     selector:
+       target: {}
+   transform:
+     required: false
+     selector:
+       object: {}

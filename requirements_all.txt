@@ -1299,6 +1299,9 @@ lw12==0.9.2
 # homeassistant.components.scrape
 lxml==5.1.0
 
+# homeassistant.components.history_plot
+matplotlib==3.9.0
+
 # homeassistant.components.matrix
 matrix-nio==0.24.0
 
@@ -1915,6 +1918,7 @@ pyhomeworks==1.1.0
 pyialarm==2.2.0
 
 # homeassistant.components.icloud
+# homeassistant.components.icloudbday
 pyicloud==1.0.0
 
 # homeassistant.components.insteon
@@ -2021,6 +2025,9 @@ pymitv==1.4.3
 
 # homeassistant.components.mochad
 pymochad==0.2.0
+
+# homeassistant.components.kostal_plenticore_g3
+pymodbus==3.6.8
 
 # homeassistant.components.modbus
 pymodbus==3.6.9
@@ -2488,6 +2495,9 @@ renson-endura-delta==1.7.1
 # homeassistant.components.reolink
 reolink-aio==0.9.6
 
+# homeassistant.components.rhasspycontrol
+requests==2.*
+
 # homeassistant.components.idteck_prox
 rfk101py==0.0.1
 
@@ -2904,6 +2914,9 @@ weatherflow4py==0.2.21
 
 # homeassistant.components.webmin
 webmin-xmlrpc==0.0.2
+
+# homeassistant.components.rhasspycontrol
+websockets==11.*
 
 # homeassistant.components.whirlpool
 whirlpool-sixth-sense==0.18.8

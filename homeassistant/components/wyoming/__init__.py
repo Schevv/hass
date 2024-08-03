@@ -20,8 +20,11 @@ _LOGGER = logging.getLogger(__name__)
 
 SATELLITE_PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.SELECT,
+    Platform.SENSOR,
     Platform.SWITCH,
+    Platform.NOTIFY,
     Platform.NUMBER,
 ]
 

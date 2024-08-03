@@ -23,9 +23,12 @@ from wyoming.tts import Synthesize, SynthesizeVoice
 from wyoming.vad import VoiceStarted, VoiceStopped
 from wyoming.wake import Detect, Detection
 
-from homeassistant.components import assist_pipeline, intent, stt, tts
+from homeassistant.components import assist_pipeline, intent, media_source, stt, tts
 from homeassistant.components.assist_pipeline import select as pipeline_select
 from homeassistant.components.assist_pipeline.vad import VadSensitivity
+from homeassistant.components.tts.media_source import (
+    generate_media_source_id as tts_generate_media_source_id,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Context, HomeAssistant, callback
 
@@ -83,6 +86,8 @@ class WyomingSatellite:
         self.device.set_is_muted_listener(self._muted_changed)
         self.device.set_pipeline_listener(self._pipeline_changed)
         self.device.set_audio_settings_listener(self._audio_settings_changed)
+        self.device.set_audio_play_listener(self._audio_play)
+        self.device.set_tts_play_listener(self._tts_play)
 
     async def run(self) -> None:
         """Run and maintain a connection to satellite."""
@@ -192,6 +197,51 @@ class WyomingSatellite:
 
         # Cancel any running pipeline
         self._audio_queue.put_nowait(None)
+
+    def _audio_play(self, wav_data: bytes) -> None:
+        """Send wav data to satellite."""
+        self.config_entry.async_create_background_task(
+            self.hass, self.stream_audio(wav_data), "sattelite stream audio"
+        )
+
+    def _tts_play(self, message: str) -> None:
+        """Send wav data to satellite."""
+
+        _LOGGER.warning("Sattelite tts_play %s", message)
+
+        pipeline_id = pipeline_select.get_chosen_pipeline(
+            self.hass,
+            DOMAIN,
+            self.device.satellite_id,
+        )
+        _LOGGER.warning("Sattelite tts_play pipeline_id %s", pipeline_id)
+        pipeline = assist_pipeline.async_get_pipeline(self.hass, pipeline_id)
+        assert pipeline is not None
+
+        tts_media_id = tts_generate_media_source_id(
+            self.hass,
+            message=message,
+            engine=pipeline.tts_engine,
+            language=pipeline.tts_language,
+            options={
+                tts.ATTR_PREFERRED_FORMAT: "wav",
+                tts.ATTR_PREFERRED_SAMPLE_RATE: 16000,
+                tts.ATTR_PREFERRED_SAMPLE_CHANNELS: 1,
+            },
+        )
+        _LOGGER.warning("Sattelite tts_play media_id %s", tts_media_id)
+
+        self.config_entry.async_create_background_task(
+            self.hass, self._stream_tts(tts_media_id), "sattelite stream tts"
+        )
+
+    async def _resolve_and_stream_tts(self, hass: HomeAssistant, media_id: str) -> None:
+        tts_media = await media_source.async_resolve_media(
+            self.hass,
+            media_id,
+            None,
+        )
+        await self._stream_tts(media_id)
 
     async def _connect_and_loop(self) -> None:
         """Connect to satellite and run pipelines until an error occurs."""
@@ -515,6 +565,9 @@ class WyomingSatellite:
                         ).event()
                     )
                 )
+        elif event.type == "systemstats":
+            if event.data:
+                self.hass.add_job(self.device.async_set_system_stats(event.data))
 
     async def _connect(self) -> None:
         """Connect to satellite over TCP."""
@@ -543,6 +596,10 @@ class WyomingSatellite:
         if extension != "wav":
             raise ValueError(f"Cannot stream audio format to satellite: {extension}")
 
+        await self.stream_audio(data)
+
+    async def stream_audio(self, data: bytes) -> None:
+        """Stream WAV data to satellite in chunks."""
         with io.BytesIO(data) as wav_io, wave.open(wav_io, "rb") as wav_file:
             sample_rate = wav_file.getframerate()
             sample_width = wav_file.getsampwidth()

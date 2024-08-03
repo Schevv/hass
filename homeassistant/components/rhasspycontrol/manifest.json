@@ -1,0 +1,15 @@
+{
+  "domain": "rhasspycontrol",
+  "name": "Rhasspy Control",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/rhasspycontrol",
+  "requirements": ["requests==2.*", "websockets==11.*"],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": ["intent", "ffmpeg"],
+  "codeowners": ["@Schevv"],
+  "iot_class": "local_push",
+  "version": 1.0,
+  "loggers": ["rhasspycontrol"]
+}

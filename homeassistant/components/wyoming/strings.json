@@ -30,6 +30,22 @@
         "name": "[%key:component::assist_pipeline::entity::binary_sensor::assist_in_progress::name%]"
       }
     },
+    "button": {
+      "ring": {
+        "name": "Ring"
+      },
+      "testnotificationsound": {
+        "name": "Test Notification Tone"
+      },
+      "speak_last_notification": {
+        "name": "Speak Last Notification"
+      }
+    },
+    "notify": {
+      "notify": {
+        "name": "[%key:component::notify::_::name%]"
+      }
+    },
     "select": {
       "pipeline": {
         "name": "[%key:component::assist_pipeline::entity::select::pipeline::name%]",
@@ -54,6 +70,20 @@
           "aggressive": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::aggressive%]",
           "relaxed": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::relaxed%]"
         }
+      },
+      "ringtone": {
+        "name": "Ringtone"
+      },
+      "notificationtone": {
+        "name": "Notification Tone"
+      }
+    },
+    "sensor": {
+      "last_notification": {
+        "name": "Last Notification"
+      },
+      "cpu_load": {
+        "name": "CPU Load"
       }
     },
     "switch": {
