@@ -1,26 +1,25 @@
 import asyncio
+from collections.abc import Callable
+from copy import copy
 import logging
+from typing import Any, cast
+
+from homeassistant import exceptions
+from homeassistant.components.logger import LOGSEVERITY
+from homeassistant.core import Context
 from homeassistant.helpers.script import (
-    Script,
     DATA_NEW_SCRIPT_RUNS_NOT_ALLOWED,
-    SCRIPT_MODE_SINGLE,
-    SCRIPT_MODE_RESTART,
     SCRIPT_MODE_QUEUED,
-    _ScriptRun,
+    SCRIPT_MODE_RESTART,
+    SCRIPT_MODE_SINGLE,
+    Script,
     _QueuedScriptRun,
+    _ScriptRun,
     _VarsType,
     script_stack_cv,
 )
-from homeassistant.core import Context
-from homeassistant import exceptions
-from copy import copy
-from homeassistant.util.dt import utcnow
-
-
-from collections.abc import Callable
-from typing import Any, cast
 from homeassistant.helpers.trace import script_execution_set
-from homeassistant.components.logger import LOGSEVERITY
+from homeassistant.util.dt import utcnow
 
 
 class ObservableScript(Script):
@@ -40,7 +39,7 @@ class ObservableScript(Script):
         # Prevent spawning new script runs when Home Assistant is shutting down
         if DATA_NEW_SCRIPT_RUNS_NOT_ALLOWED in self._hass.data:
             self._log("Home Assistant is shutting down, starting script blocked")
-            return
+            return None
 
         # Prevent spawning new script runs if not allowed by script mode
         if self.is_running:
@@ -48,7 +47,7 @@ class ObservableScript(Script):
                 if self._max_exceeded != "SILENT":
                     self._log("Already running", level=LOGSEVERITY[self._max_exceeded])
                 script_execution_set("failed_single")
-                return
+                return None
             if self.script_mode != SCRIPT_MODE_RESTART and self.runs == self.max_runs:
                 if self._max_exceeded != "SILENT":
                     self._log(
@@ -56,7 +55,7 @@ class ObservableScript(Script):
                         level=LOGSEVERITY[self._max_exceeded],
                     )
                 script_execution_set("failed_max_runs")
-                return
+                return None
 
         # If this is a top level Script then make a copy of the variables in case they
         # are read-only, but more importantly, so as not to leak any variables created
@@ -77,11 +76,10 @@ class ObservableScript(Script):
                 variables = {}
 
             variables["context"] = context
+        elif self._copy_variables_on_run:
+            variables = cast(dict, copy(run_variables))
         else:
-            if self._copy_variables_on_run:
-                variables = cast(dict, copy(run_variables))
-            else:
-                variables = cast(dict, run_variables)
+            variables = cast(dict, run_variables)
 
         # Prevent non-allowed recursive calls which will cause deadlocks when we try to
         # stop (restart) or wait for (queued) our own script run.
@@ -93,7 +91,7 @@ class ObservableScript(Script):
         ):
             script_execution_set("disallowed_recursion_detected")
             self._log("Disallowed recursion detected", level=logging.WARNING)
-            return
+            return None
 
         if self.script_mode != SCRIPT_MODE_QUEUED:
             cls = _ScriptRun

@@ -2,10 +2,8 @@
 
 import asyncio
 from collections import namedtuple
-from enum import Enum
 import socket
 from struct import *
-from typing import Tuple
 
 from .protocol import *
 
@@ -117,8 +115,7 @@ def process_command_response(msgBuf: bytearray) -> tuple[bool, int, int]:
 
 
 def decode_text_field(buf):
-    """
-    Convert char[] string in buffer to python str object
+    """Convert char[] string in buffer to python str object
     :param buf: bytearray with array of chars
     :return: string
     """
@@ -172,8 +169,7 @@ class Projector:
     def __init__(
         self, projector_info: ProjectorInfo, port: int = None, timeout: float = None
     ) -> None:
-        """
-        Base class for projector communication.
+        """Base class for projector communication.
         Enables communication with Projector, Sending commands and Querying Power State
         """
         self.info = projector_info
@@ -194,14 +190,12 @@ class Projector:
         try:
             sock.connect((self.info.ip, self.port))
             sent = sock.send(my_buf)
-        except socket.timeout as exc:
+        except TimeoutError as exc:
             raise Exception(f"Timeout while trying to send command {command}") from exc
 
         if len(my_buf) != sent:
             raise ConnectionError(
-                "Failed sending entire buffer to projector. Sent {} out of {} !".format(
-                    sent, len(my_buf)
-                )
+                f"Failed sending entire buffer to projector. Sent {sent} out of {len(my_buf)} !"
             )
         response_buf = sock.recv(1024)
         sock.close()

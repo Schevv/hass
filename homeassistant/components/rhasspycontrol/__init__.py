@@ -1,4 +1,5 @@
 """The Rhasspy Control integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -9,9 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import discovery, entity_registry
-from homeassistant.helpers.service import (
-    async_extract_config_entry_ids,
-)
+from homeassistant.helpers.service import async_extract_config_entry_ids
 from homeassistant.helpers.typing import ConfigType
 
 from . import sounds

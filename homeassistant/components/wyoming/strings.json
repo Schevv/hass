@@ -84,6 +84,15 @@
       },
       "cpu_load": {
         "name": "CPU Load"
+      },
+      "vmem": {
+        "name": "RAM"
+      },
+      "disk_mem": {
+        "name": "Disk Memory"
+      },
+      "temperature": {
+        "name": "Temperature"
       }
     },
     "switch": {

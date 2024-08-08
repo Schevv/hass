@@ -1,9 +1,12 @@
 """Provides device actions for Rhasspy Control."""
+
 from __future__ import annotations
+
 import logging
 
 import voluptuous as vol
 
+from homeassistant.components.button import SERVICE_PRESS
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_DEVICE_ID,
@@ -11,8 +14,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_TYPE,
 )
-from homeassistant.components.button import SERVICE_PRESS
-
 from homeassistant.core import Context, HomeAssistant
 from homeassistant.helpers import config_validation as cv, entity_registry as er
 from homeassistant.helpers.typing import ConfigType, TemplateVarsType

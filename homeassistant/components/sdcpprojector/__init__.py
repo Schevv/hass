@@ -1,4 +1,5 @@
 """The Sony Projector integration."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -40,9 +41,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     projectors = (Projector(ProjectorInfo(*info)) for info in entry.data["devices"])
     hass.data[DOMAIN][entry.entry_id] = dict()
     for projector in projectors:
-        hass.data[DOMAIN][entry.entry_id][
-            projector.info.serial_number
-        ] = SdcpCoordinator(hass, projector, 30)
+        hass.data[DOMAIN][entry.entry_id][projector.info.serial_number] = (
+            SdcpCoordinator(hass, projector, 30)
+        )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

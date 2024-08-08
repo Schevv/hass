@@ -1,4 +1,5 @@
 """Offer template automation rules."""
+
 import logging
 
 import voluptuous as vol

@@ -1,4 +1,5 @@
 """Sensor platform for Camera Player integration."""
+
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity

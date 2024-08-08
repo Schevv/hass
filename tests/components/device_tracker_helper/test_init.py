@@ -1,4 +1,5 @@
 """Test the Device Tracker Helper integration."""
+
 import pytest
 
 from homeassistant.components.device_tracker_helper.const import DOMAIN

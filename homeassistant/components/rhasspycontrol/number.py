@@ -8,8 +8,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .controller import RhasspyDeviceController
 from .const import DOMAIN
+from .controller import RhasspyDeviceController
 
 _LOGGER = logging.getLogger(__name__)
 

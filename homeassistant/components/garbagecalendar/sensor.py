@@ -1,20 +1,16 @@
-from datetime import date, datetime
-import json
+from datetime import date
 import logging
 
-import requests
-
-from .const import DOMAIN
-
-from homeassistant.components.calendar import CalendarEntity, CalendarEvent
-from homeassistant.components.sensor.const import SensorDeviceClass
-from . import GarbageCalendarCoordinator
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor.const import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util.dt import now
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util.dt import now
+
+from . import GarbageCalendarCoordinator
+from .const import DOMAIN
 
 # MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
 _LOGGER = logging.getLogger(__name__)

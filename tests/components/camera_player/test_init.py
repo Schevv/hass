@@ -1,4 +1,5 @@
 """Test the Camera Player integration."""
+
 import pytest
 
 from homeassistant.components.camera_player.const import DOMAIN

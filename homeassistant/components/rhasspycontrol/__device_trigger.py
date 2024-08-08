@@ -1,4 +1,5 @@
 """Provides device triggers for Rhasspy Control."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -17,7 +18,6 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
-from homeassistant.helpers import config_validation as cv, entity_registry as er
 from homeassistant.helpers.trigger import TriggerActionType, TriggerInfo
 from homeassistant.helpers.typing import ConfigType
 

@@ -55,7 +55,6 @@ class GarbageCalendar(CoordinatorEntity, CalendarEntity):
 
     def set_native_value(self, value: float) -> None:
         """Update the current value."""
-        pass
 
     @property
     def event(self) -> CalendarEvent:

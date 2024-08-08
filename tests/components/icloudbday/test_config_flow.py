@@ -1,4 +1,5 @@
 """Test the Apple iCloud Birthdays config flow."""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest

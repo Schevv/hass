@@ -3,7 +3,7 @@
   "name": "My Intent",
   "config_flow": false,
   "documentation": "https://www.home-assistant.io/integrations/myintent",
-  "requirements": [],
+  "requirements": ["openai==1.38.0"],
   "ssdp": [],
   "zeroconf": [],
   "homekit": {},

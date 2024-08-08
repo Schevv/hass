@@ -1,9 +1,7 @@
 {
   "domain": "camera_player",
   "name": "Camera Player",
-  "codeowners": [
-    "@Schevv"
-  ],
+  "codeowners": ["@Schevv"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://www.home-assistant.io/integrations/camera_player",

@@ -1,4 +1,5 @@
 """The Kostal Plenticore G3 integration."""
+
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry

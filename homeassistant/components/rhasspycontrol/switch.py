@@ -76,6 +76,7 @@ class SpeakNotificationsRhasspyControlEntity(RhasspySwitch, RestoreEntity):
         self._attr_is_on = False
         self.async_write_ha_state()
 
+
 class SignalOnlyNotificationsRhasspyControlEntity(RhasspySwitch, RestoreEntity):
     """Switch that controls if this Rhasspy instance will output notification as text or sound."""
 
@@ -101,6 +102,7 @@ class SignalOnlyNotificationsRhasspyControlEntity(RhasspySwitch, RestoreEntity):
         """Turn the entity on."""
         self._attr_is_on = False
         self.async_write_ha_state()
+
 
 class ListenForWakeRhasspyControlEntity(RhasspySwitch):
     """Button to start/stop listening for the wake word"""

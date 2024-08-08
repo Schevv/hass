@@ -1,4 +1,5 @@
 """Test the listservice integration."""
+
 import pytest
 
 from homeassistant.components.listservice.const import DOMAIN

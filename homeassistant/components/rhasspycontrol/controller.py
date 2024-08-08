@@ -1,4 +1,5 @@
 """Device Controller for Rhasspy"""
+
 import asyncio
 import functools
 import importlib
@@ -30,7 +31,7 @@ class RhasspyDeviceController(DataUpdateCoordinator[RhasspyStatus]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry, config_data) -> None:
         super().__init__(hass, _LOGGER, name="RhasspyControl")
         self.tts_notification_switch: SwitchEntity = None
-        self.tts_notification_sound_switch : SwitchEntity = None
+        self.tts_notification_sound_switch: SwitchEntity = None
         self.ringer_sound: SelectEntity = None
         self.notification_sound: SelectEntity = None
         self.success_sound: SelectEntity = None
@@ -135,7 +136,7 @@ class RhasspyDeviceController(DataUpdateCoordinator[RhasspyStatus]):
             )
         )
 
-        if self.tts_notifications_as_sound and not kwargs.get('force', False):
+        if self.tts_notifications_as_sound and not kwargs.get("force", False):
             self.play_sound(self.notification_sound.state)
             return
 
@@ -150,7 +151,11 @@ class RhasspyDeviceController(DataUpdateCoordinator[RhasspyStatus]):
 
     async def speak_last_notification(self) -> None:
         """Speak the last notification."""
-        await self.perform_tts_notification(self.data.last_tts_notification, title=self.data.last_tts_notification_title, force=True)
+        await self.perform_tts_notification(
+            self.data.last_tts_notification,
+            title=self.data.last_tts_notification_title,
+            force=True,
+        )
 
     def _hotword_toggle_on(self, payload):
         self.async_set_updated_data(self.data._replace(listening=True))
@@ -174,8 +179,17 @@ class RhasspyDeviceController(DataUpdateCoordinator[RhasspyStatus]):
         total_disk = payload["total_disk"]
         used_disk = payload["used_disk"]
         current_temp = payload["current_temp"]
-        self.async_set_updated_data(self.data._replace(cpu_percentage=cpu_percentage, cpu_count=cpu_count, total_memory=total_memory, used_memory=used_memory, total_disk=total_disk, used_disk=used_disk, current_temp=current_temp))
-
+        self.async_set_updated_data(
+            self.data._replace(
+                cpu_percentage=cpu_percentage,
+                cpu_count=cpu_count,
+                total_memory=total_memory,
+                used_memory=used_memory,
+                total_disk=total_disk,
+                used_disk=used_disk,
+                current_temp=current_temp,
+            )
+        )
 
     def _text_captured(self, payload):
         # session_id = payload.get("session_id", None)  # string or null

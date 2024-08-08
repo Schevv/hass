@@ -1,6 +1,7 @@
 """Contains the RhasspyStatus type"""
-from typing import NamedTuple
+
 from datetime import datetime
+from typing import NamedTuple
 
 
 class RhasspyStatus(NamedTuple):
@@ -30,24 +31,23 @@ class RhasspyStatus(NamedTuple):
     last_tts_notification_title: str | None = None
     """Optional title of the the last accepted notification"""
 
-    cpu_percentage : float | None = None
+    cpu_percentage: float | None = None
     """CPU usage in the last 15 minutes"""
 
-    cpu_count : int | None = None
+    cpu_count: int | None = None
     """Total number of CPUs"""
 
-    total_memory : int | None = None
+    total_memory: int | None = None
     """Total memory"""
 
-    used_memory : int | None = None
+    used_memory: int | None = None
     """Memory used"""
 
-    total_disk : int | None = None
+    total_disk: int | None = None
     """Total disk size"""
 
-    used_disk : int | None = None
+    used_disk: int | None = None
     """Used disk"""
 
-    current_temp : float | None = None
+    current_temp: float | None = None
     """Current CPU temperature"""
-

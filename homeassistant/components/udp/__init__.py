@@ -1,5 +1,7 @@
 """The udp integration."""
+
 from __future__ import annotations
+
 import socket
 
 from homeassistant.config_entries import ConfigEntry

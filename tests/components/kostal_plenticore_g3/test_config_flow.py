@@ -1,8 +1,12 @@
 """Test the Kostal Plenticore G3 config flow."""
+
 from unittest.mock import AsyncMock, patch
 
 from homeassistant import config_entries
-from homeassistant.components.kostal_plenticore_g3.config_flow import CannotConnect, InvalidAuth
+from homeassistant.components.kostal_plenticore_g3.config_flow import (
+    CannotConnect,
+    InvalidAuth,
+)
 from homeassistant.components.kostal_plenticore_g3.const import DOMAIN
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant

@@ -25,7 +25,6 @@ from wyoming.wake import Detect, Detection
 
 from homeassistant.components import assist_pipeline, intent, media_source, stt, tts
 from homeassistant.components.assist_pipeline import select as pipeline_select
-from homeassistant.components.assist_pipeline.vad import VadSensitivity
 from homeassistant.components.tts.media_source import (
     generate_media_source_id as tts_generate_media_source_id,
 )
@@ -207,14 +206,11 @@ class WyomingSatellite:
     def _tts_play(self, message: str) -> None:
         """Send wav data to satellite."""
 
-        _LOGGER.warning("Sattelite tts_play %s", message)
-
         pipeline_id = pipeline_select.get_chosen_pipeline(
             self.hass,
             DOMAIN,
             self.device.satellite_id,
         )
-        _LOGGER.warning("Sattelite tts_play pipeline_id %s", pipeline_id)
         pipeline = assist_pipeline.async_get_pipeline(self.hass, pipeline_id)
         assert pipeline is not None
 
@@ -229,8 +225,6 @@ class WyomingSatellite:
                 tts.ATTR_PREFERRED_SAMPLE_CHANNELS: 1,
             },
         )
-        _LOGGER.warning("Sattelite tts_play media_id %s", tts_media_id)
-
         self.config_entry.async_create_background_task(
             self.hass, self._stream_tts(tts_media_id), "sattelite stream tts"
         )
@@ -379,6 +373,11 @@ class WyomingSatellite:
                                 break
 
                     _LOGGER.debug("Client detected wake word: %s", wake_word_phrase)
+                elif client_event.type == "systemstats":
+                    if client_event.data:
+                        self.hass.add_job(
+                            self.device.async_set_system_stats(client_event.data)
+                        )
                 else:
                     _LOGGER.debug("Unexpected event from satellite: %s", client_event)
 
@@ -460,9 +459,9 @@ class WyomingSatellite:
                     noise_suppression_level=self.device.noise_suppression_level,
                     auto_gain_dbfs=self.device.auto_gain,
                     volume_multiplier=self.device.volume_multiplier,
-                    silence_seconds=VadSensitivity.to_seconds(
-                        self.device.vad_sensitivity
-                    ),
+                    # silence_seconds=VadSensitivity.to_seconds(
+                    #    self.device.vad_sensitivity
+                    # ),
                 ),
                 device_id=self.device.device_id,
                 wake_word_phrase=wake_word_phrase,
@@ -565,9 +564,6 @@ class WyomingSatellite:
                         ).event()
                     )
                 )
-        elif event.type == "systemstats":
-            if event.data:
-                self.hass.add_job(self.device.async_set_system_stats(event.data))
 
     async def _connect(self) -> None:
         """Connect to satellite over TCP."""

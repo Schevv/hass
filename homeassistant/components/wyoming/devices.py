@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Coroutine
+from dataclasses import dataclass, field
 import importlib.resources
 import logging
 from pathlib import Path
@@ -118,14 +118,12 @@ class SatelliteDevice:
     @callback
     def set_ringtone(self, ringtone: str) -> None:
         """Set the ringtone."""
-        _LOGGER.warning("Setting ring tone to %s", ringtone)
         if ringtone != self.ringtone:
             self.ringtone = ringtone
 
     @callback
     def set_notificationtone(self, notificationtone: str) -> None:
         """Set the ringtone."""
-        _LOGGER.warning("Setting notification tone to %s", notificationtone)
         if notificationtone != self.notificationtone:
             self.notificationtone = notificationtone
 
@@ -160,17 +158,13 @@ class SatelliteDevice:
         """Play the currently selected ringtone."""
         if self.ringtone is None:
             self.ringtone = self.get_sounds(hass)[0]
-            _LOGGER.warning("Setting ringtone to default %s", self.ringtone)
         data = self.get_sound_data(hass, self.ringtone)
-        _LOGGER.warning("Getting data for ringtone %s", len(data))
         self.play_audio(data)
 
     def play_notificationtone(self, hass: HomeAssistant) -> None:
         """Play the currently selected notification."""
-        _LOGGER.warning("Notification tone to play is %s", self.notificationtone)
         if self.notificationtone is not None:
             data = self.get_sound_data(hass, self.notificationtone)
-            _LOGGER.warning("Getting data for notification %s", len(data))
             self.play_audio(data)
 
     def get_notificationtone_data(self, hass: HomeAssistant) -> bytes:
@@ -183,11 +177,8 @@ class SatelliteDevice:
         """Get the wav data for the given sound name."""
         custom_sounds_dir = Path(hass.config.path("custom_sounds"))
         if custom_sounds_dir.is_dir():
-            _LOGGER.warning("custom_sounds is dir")
             sound_path = custom_sounds_dir / (soundfile + ".wav")
-            _LOGGER.warning("sound_path is %s", sound_path)
             if sound_path.is_file():
-                _LOGGER.warning("sound_path is file")
                 with sound_path.open("rb") as file:
                     return file.read()
         with (
@@ -195,17 +186,10 @@ class SatelliteDevice:
             .joinpath(soundfile + ".wav")
             .open("rb") as file
         ):
-            _LOGGER.warning("soundfile is %s", soundfile + ".wav")
             return file.read()
 
     def set_last_notification(self, message: str, title: str) -> None:
         """Set last_notification."""
-        _LOGGER.warning(
-            "device last notification set %s %s %s",
-            self._last_notification_listener is not None,
-            message,
-            title,
-        )
         self.last_notification = message
         if self._last_notification_listener is not None:
             self._last_notification_listener(message, title)
@@ -268,9 +252,6 @@ class SatelliteDevice:
         self, last_notification_listener: Callable[[str], None]
     ) -> None:
         """Add a listener for changes of last_notification."""
-        _LOGGER.warning(
-            "last_notification_listener set %s", last_notification_listener is not None
-        )
         self._last_notification_listener = last_notification_listener
 
     def get_assist_in_progress_entity_id(self, hass: HomeAssistant) -> str | None:

@@ -1,15 +1,17 @@
 """Contains the Rhasspy Control sensors"""
+
+import datetime
+
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.components.sensor.const import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.components.sensor import SensorEntity
-import datetime
 
-from .controller import RhasspyDeviceController
 from .const import DOMAIN
+from .controller import RhasspyDeviceController
 
 
 class RhasspySensor(CoordinatorEntity, SensorEntity):
@@ -83,6 +85,7 @@ class RhasspyLastVoiceOutputSensor(RhasspySensor):
         self._attr_native_value = self.device_controller.data.last_output_timestamp
         self.async_write_ha_state()
 
+
 class RhasspyCpuLoadSensor(RhasspySensor):
     def __init__(self, device_controller: RhasspyDeviceController) -> None:
         super().__init__(device_controller, "Cpu Load")
@@ -97,8 +100,11 @@ class RhasspyCpuLoadSensor(RhasspySensor):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self._attr_native_value = self.device_controller.data.cpu_percentage
-        self._attr_extra_state_attributes = { "cpu_count": self.device_controller.data.cpu_count }
+        self._attr_extra_state_attributes = {
+            "cpu_count": self.device_controller.data.cpu_count
+        }
         self.async_write_ha_state()
+
 
 class RhasspyCpuTempSensor(RhasspySensor):
     def __init__(self, device_controller: RhasspyDeviceController) -> None:
@@ -117,6 +123,7 @@ class RhasspyCpuTempSensor(RhasspySensor):
         self._attr_native_value = self.device_controller.data.current_temp
         self.async_write_ha_state()
 
+
 class RhasspyMemorySensor(RhasspySensor):
     def __init__(self, device_controller: RhasspyDeviceController) -> None:
         super().__init__(device_controller, "RAM")
@@ -132,8 +139,11 @@ class RhasspyMemorySensor(RhasspySensor):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self._attr_native_value = self.device_controller.data.used_memory
-        self._attr_extra_state_attributes = { "total": self.device_controller.data.total_memory }
+        self._attr_extra_state_attributes = {
+            "total": self.device_controller.data.total_memory
+        }
         self.async_write_ha_state()
+
 
 class RhasspyDiskSensor(RhasspySensor):
     def __init__(self, device_controller: RhasspyDeviceController) -> None:
@@ -150,7 +160,9 @@ class RhasspyDiskSensor(RhasspySensor):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self._attr_native_value = self.device_controller.data.used_disk
-        self._attr_extra_state_attributes =  { "total": self.device_controller.data.total_disk }
+        self._attr_extra_state_attributes = {
+            "total": self.device_controller.data.total_disk
+        }
         self.async_write_ha_state()
 
 
@@ -171,7 +183,7 @@ async def async_setup_entry(
             RhasspyCpuLoadSensor(device_controller),
             RhasspyCpuTempSensor(device_controller),
             RhasspyMemorySensor(device_controller),
-            RhasspyDiskSensor(device_controller)
+            RhasspyDiskSensor(device_controller),
         ],
         True,
     )

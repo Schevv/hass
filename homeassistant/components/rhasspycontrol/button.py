@@ -1,4 +1,5 @@
 """Switches for AVM Fritz!Box buttons."""
+
 from __future__ import annotations
 
 import importlib.resources
@@ -140,17 +141,17 @@ class ReplayOutputRhasspyControlButton(RhasspyControlButton):
             "text-to-speech?repeat=true", timeout=10
         )
 
+
 class SpeakLastNotificationRhasspyControlButton(RhasspyControlButton):
     """Button to speak the last notification."""
 
     def __init__(self, device_controller) -> None:
-        super().__init__(
-            device_controller, "Speak Notification", "mdi:message-text"
-        )
+        super().__init__(device_controller, "Speak Notification", "mdi:message-text")
 
     async def async_press(self) -> None:
         """Handle the button press."""
         await self.device_controller.speak_last_notification()
+
 
 async def async_setup_entry(
     hass: HomeAssistant,

@@ -1,4 +1,5 @@
 """Template platform that aggregates meteorological data."""
+
 from __future__ import annotations
 
 import voluptuous as vol

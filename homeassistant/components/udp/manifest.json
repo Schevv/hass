@@ -8,9 +8,7 @@
   "zeroconf": [],
   "homekit": {},
   "dependencies": [],
-  "codeowners": [
-    "@schevv"
-  ],
+  "codeowners": ["@schevv"],
   "iot_class": "local_push",
   "version": "0.1"
 }

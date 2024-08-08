@@ -1,27 +1,29 @@
 """The GarbageCalendar integration."""
-from __future__ import annotations
-from datetime import date, datetime, timedelta
 
+from __future__ import annotations
+
+from datetime import date, datetime, timedelta
+import json
+import logging
+
+import requests
+
+from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.util.dt import now
-
-from .garbage_news import GarbageNews
 
 from .const import (
     DEVICE_IDENTIFIER,
     DOMAIN,
     FETCH_TIMEOUT,
-    URL,
     UPDATE_INTERVAL_SECONDS,
+    URL,
 )
-import logging
-import requests
-import json
+from .garbage_news import GarbageNews
 
 _LOGGER = logging.getLogger(__name__)
 

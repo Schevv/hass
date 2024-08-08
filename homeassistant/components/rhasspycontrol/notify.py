@@ -1,4 +1,5 @@
 """Contains the entry point for the Rhasspy notifications."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -29,6 +30,7 @@ async def async_get_service(
 
     return RhasspyTtsNotificationService(discovery_info["controller"])
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -39,9 +41,7 @@ async def async_setup_entry(
     device_controller = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
-        [
-            RhasspyNotifier(device_controller)
-        ],
+        [RhasspyNotifier(device_controller)],
         True,
     )
 
@@ -60,6 +60,7 @@ class RhasspyTtsNotificationService(BaseNotificationService):
     async def async_send_message(self, message: str, **kwargs: Any) -> None:
         await self.device_controller.perform_tts_notification(message, **kwargs)
 
+
 class RhasspyNotifier(NotifyEntity):
     """Entity to notify via TTS."""
 
@@ -72,9 +73,7 @@ class RhasspyNotifier(NotifyEntity):
         self._attr_name = "Notify"
         self._attr_available = True
         self._attr_should_poll = False
-        self._attr_unique_id = (
-            device_controller.unique_id + "-notify"
-        )
+        self._attr_unique_id = device_controller.unique_id + "-notify"
 
     async def async_send_message(self, message: str, title: str | None = None) -> None:
         """Send a message."""

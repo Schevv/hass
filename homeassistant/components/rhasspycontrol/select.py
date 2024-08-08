@@ -9,8 +9,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .controller import RhasspyDeviceController
 from .const import DOMAIN, SOUNDS
+from .controller import RhasspyDeviceController
 
 _LOGGER = logging.getLogger(__name__)
 

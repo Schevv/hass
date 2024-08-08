@@ -1,4 +1,5 @@
 """Support to interact with a Music Player Daemon."""
+
 from __future__ import annotations
 
 import logging
@@ -14,7 +15,6 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaPlayerState,
     MediaType,
-    RepeatMode,
     async_process_play_media_url,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -43,21 +43,27 @@ async def async_setup_entry(
     async_add_entities([entity])
 
 
-
 class CameraPlayerMediaPlayer(MediaPlayerEntity):
     """Media player of the Camera Player."""
 
     def __init__(self, device_name: str, uid: str) -> None:
         """Initialize the player."""
-        self._attr_device_info = DeviceInfo(name=device_name, identifiers={(DOMAIN, uid)})
+        self._attr_device_info = DeviceInfo(
+            name=device_name, identifiers={(DOMAIN, uid)}
+        )
         self._attr_has_entity_name = True
         self._attr_should_poll = False
-        self._attr_supported_features = MediaPlayerEntityFeature.BROWSE_MEDIA | MediaPlayerEntityFeature.PLAY_MEDIA | MediaPlayerEntityFeature.PLAY | MediaPlayerEntityFeature.STOP
+        self._attr_supported_features = (
+            MediaPlayerEntityFeature.BROWSE_MEDIA
+            | MediaPlayerEntityFeature.PLAY_MEDIA
+            | MediaPlayerEntityFeature.PLAY
+            | MediaPlayerEntityFeature.STOP
+        )
         self._attr_unique_id = "M" + uid
         self._attr_state = MediaPlayerState.IDLE
         self._attr_media_content_type = MediaType.MOVIE
-        self._camera : CameraPlayerCamera = None
-        self.current_stream : str | None = None # TODO: Replace with playlist
+        self._camera: CameraPlayerCamera = None
+        self.current_stream: str | None = None  # TODO: Replace with playlist
 
     @property
     def camera(self) -> CameraPlayerCamera | None:
@@ -85,8 +91,9 @@ class CameraPlayerMediaPlayer(MediaPlayerEntity):
         self.async_schedule_update_ha_state()
 
     async def async_browse_media(
-        self, media_content_type: MediaType | str | None = None,
-        media_content_id: str | None = None
+        self,
+        media_content_type: MediaType | str | None = None,
+        media_content_id: str | None = None,
     ) -> BrowseMedia:
         """Implement the websocket media browsing helper."""
         # If your media player has no own media sources to browse, route all browse commands
@@ -104,11 +111,14 @@ class CameraPlayerMediaPlayer(MediaPlayerEntity):
         media_type: MediaType | str,
         media_id: str,
         enqueue: MediaPlayerEnqueue | None = None,
-        announce: bool | None = None, **kwargs: Any
+        announce: bool | None = None,
+        **kwargs: Any,
     ) -> None:
         """Play a piece of media."""
         if media_source.is_media_source_id(media_id):
-            play_item = await media_source.async_resolve_media(self.hass, media_id, self.entity_id)
+            play_item = await media_source.async_resolve_media(
+                self.hass, media_id, self.entity_id
+            )
             # play_item returns a relative URL if it has to be resolved on the Home Assistant host
             # This call will turn it into a full URL
             media_id = async_process_play_media_url(self.hass, play_item.url)
@@ -117,8 +127,9 @@ class CameraPlayerMediaPlayer(MediaPlayerEntity):
 
         # Replace this with calling your media player play media function.
         self.current_stream = media_id
-        self._attr_media_content_type = MediaType.MOVIE if media_id is not None else None
+        self._attr_media_content_type = (
+            MediaType.MOVIE if media_id is not None else None
+        )
         self._attr_state = MediaPlayerState.PLAYING
         await self.camera.set_source_stream(self.current_stream)
         self.async_schedule_update_ha_state()
-

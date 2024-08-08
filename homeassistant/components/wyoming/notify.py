@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import importlib
-import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from homeassistant.components.notify import NotifyEntity, NotifyEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import restore_state
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -18,6 +14,7 @@ from .entity import WyomingSatelliteEntity
 
 if TYPE_CHECKING:
     from .models import DomainDataItem
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -33,9 +30,7 @@ async def async_setup_entry(
     async_add_entities([WyomingSatelliteNotify(item.satellite.device)])
 
 
-class WyomingSatelliteNotify(
-    WyomingSatelliteEntity, NotifyEntity
-):
+class WyomingSatelliteNotify(WyomingSatelliteEntity, NotifyEntity):
     """Entity to trigger a stt notification on the satellite."""
 
     entity_description = NotifyEntityDescription(

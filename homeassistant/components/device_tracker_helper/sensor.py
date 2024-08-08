@@ -1,4 +1,5 @@
 """Sensor platform for Device Tracker Helper integration."""
+
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity

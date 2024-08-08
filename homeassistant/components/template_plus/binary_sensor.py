@@ -1,13 +1,13 @@
 """Support for exposing a templated binary sensor."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
 import logging
-from typing import Any
+from typing import Any, Self
 
-from typing_extensions import Self
 import voluptuous as vol
 
 from homeassistant.components.binary_sensor import (

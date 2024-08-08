@@ -1,4 +1,5 @@
 """Test the Camera Player config flow."""
+
 from unittest.mock import AsyncMock
 
 import pytest
